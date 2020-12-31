@@ -1,7 +1,0 @@
----
-- hosts: kafka
-  become: true
-  roles:
-#    - { role: chubock.elasticsearch, proxy_url: "http://pinket:sharif@dp.pinket.com:45345" }
-    - role: ../kafka
-  serial: 1
