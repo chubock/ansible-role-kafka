@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: kafka
   author: Hassan Moosavi
   description: A role to install Apache Kafka cluster
 
