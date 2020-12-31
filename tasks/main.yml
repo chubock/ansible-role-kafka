@@ -1,0 +1,129 @@
+---
+- name: check tar installation
+  apt:
+    name: tar
+
+- name: check unzip installation
+  apt:
+    name: unzip
+
+- name: create kafka user
+  user:
+    name: kafka
+    shell: /bin/bash
+    home: /var/lib/kafka
+
+- name: check {{ kafka_data_path }} directory existense
+  file:
+    path: "{{ log.dirs }}"
+    state: directory
+    owner: kafka
+    group: kafka
+
+- name: check {{ zookeeper.dataDir }} directory existense
+  file:
+    path: "{{ zookeeper.dataDir }}"
+    state: directory
+    owner: kafka
+    group: kafka
+
+- name: updating zookeeper myid file
+  template:
+    src: myid.j2
+    dest: "{{ zookeeper.dataDir }}/myid"
+    owner: kafka
+    group: kafka
+
+- name: check if bin folder exists.
+  stat:
+    path: "{{ kafka_installation_path }}/bin"
+  register: binaryFolder
+
+- name: unarchive package
+  unarchive:
+    src: "{{ kafka_url }}"
+    dest: '{{ kafka_installation_path }}'
+    copy: false
+    owner: kafka
+    group: kafka
+    extra_opts:
+      - --strip-components=1
+  when: not binaryFolder.stat.exists
+
+- name: check {{ prometheus_path }} folder exists
+  file:
+    path: '{{ prometheus_path }}'
+    state: directory
+  when: prometheus_exporter
+
+- name: copy jolokia javaagent
+  copy:
+    src: 'jolokia-jvm-1.6.2-agent.jar'
+    dest: '{{ kafka_installation_path }}/jolokia-jvm-1.6.2-agent.jar'
+    owner: kafka
+    group: kafka
+  when: prometheus_exporter
+
+- name: copy jmx_prometheus javaagent
+  copy:
+    src: 'jmx_prometheus_javaagent-0.13.0.jar'
+    dest: '{{ prometheus_path }}/jmx_prometheus_javaagent-0.13.0.jar'
+    owner: kafka
+    group: kafka
+  when: prometheus_exporter
+
+- name: copy prometheus kafka config file
+  copy:
+    src: kafka-2_0_0.yml
+    dest: '{{ prometheus_path }}/kafka-2_0_0.yml'
+    owner: kafka
+    group: kafka
+  when: prometheus_exporter
+
+- name: updating server.properties file
+  template:
+    src: "{{ kafka_config_template }}"
+    dest: "{{ kafka_installation_path }}/config/server.properties"
+    owner: kafka
+    group: kafka
+
+- name: updating zookeeper.properties file
+  template:
+    src: "{{ zookeeper_config_template }}"
+    dest: "{{ kafka_installation_path }}/config/zookeeper.properties"
+    owner: kafka
+    group: kafka
+
+- name: updating kafka.service systemd file
+  template:
+    src: "{{ kafka_service_template }}"
+    dest: /lib/systemd/system/kafka.service
+
+- name: updating kafka.service systemd file
+  template:
+    src: "{{ zookeeper_service_template }}"
+    dest: /lib/systemd/system/zookeeper.service
+
+- name: enabling and starting zookeeper service
+  systemd:
+    name: zookeeper
+    state: restarted
+    enabled: yes
+
+- name: enabling and starting kafka service
+  systemd:
+    name: kafka
+    state: restarted
+    enabled: yes
+
+- name: Pause play until cluster is stable
+  uri:
+    url: "http://localhost:8778/jolokia/read/kafka.server:name=UnderReplicatedPartitions,type=ReplicaManager/Value"
+    method: GET
+    status_code: 200,-1
+  register: _result
+  until: _result.status == 200 and _result.json.status == 200 and _result.json.value == 0
+  retries: "{{ stable_rolling_update_retries }}"
+  delay: "{{ stable_rolling_update_delay }}"
+  become: no
+  when: stable_rolling_update

@@ -1,0 +1,105 @@
+---
+kafka_installation_path: /var/lib/kafka
+kafka_url: https://downloads.apache.org/kafka/2.7.0/kafka_2.13-2.7.0.tgz
+zookeeper_config_template: zookeeper.properties.j2
+zookeeper_service_template: zookeeper.service.j2
+kafka_config_template: server.properties.j2
+kafka_service_template: kafka.service.j2
+prometheus_exporter: true
+prometheus_path: /var/lib/prometheus
+java_home: /opt/java/default
+stable_rolling_update: true
+stable_rolling_update_retries: 12
+stable_rolling_update_delay: 5
+
+
+broker:
+  id: "{{ brokerId }}"
+
+listeners: PLAINTEXT://:9092
+
+advertised:
+  listeners: PLAINTEXT://{{ inventory_hostname }}:9092
+
+num:
+  partitions: 5
+  network:
+    threads: 3
+  io:
+    threads: 8
+  recovery:
+    threads:
+      per:
+        data:
+          dir: 1
+
+socket:
+  send:
+    buffer:
+      bytes: 102400
+  receive:
+    buffer:
+      bytes: 104857600
+  request:
+    max:
+      bytes: 104857600
+
+log:
+  dirs: /data/kafka
+  retention:
+    hours: 168
+    check:
+      interval:
+        ms: 300000
+  segment:
+    bytes: 1073741824
+
+offsets:
+  topic:
+    replication:
+      factor: 3
+
+transaction:
+  state:
+    log:
+      replication:
+        factor: 3
+      min:
+        isr: 2
+
+zookeeper:
+  hosts: "{{groups['kafka']}}"
+  port: 2181
+  dataDir: /data/zookeeper
+  maxClientCnxns: 60
+  admin:
+    enableServer: true
+    serverPort: 8080
+  initLimit: 10
+  syncLimit: 5
+  connection:
+    timeout:
+      ms: 6000
+
+delete:
+  topic:
+    enable: true
+
+default:
+  replication:
+    factor: 3
+
+min:
+  insync:
+    replicas: 2
+
+auto:
+  create:
+    topics:
+      enable: false
+
+group:
+  initial:
+    rebalance:
+      delay:
+        ms: 0
