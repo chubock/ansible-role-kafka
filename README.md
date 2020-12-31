@@ -6,7 +6,7 @@ A role to install `Apache Kafka` cluster.
 Role Variables
 --------------
 
-The variable `borkerId` should be defined at host level and indicates the id of zookeeper instance and docker broker:
+The variable `borkerId` should be defined at host level and indicates the zookeeper instance id and kafka broker id:
 
     [kafka]
     docker1.local brokerId=1
