@@ -24,6 +24,8 @@ The following variables are used for installation purposes:
     prometheus_exporter: whether to install prometheus exporter or not. default: true
     prometheus_path: path to install prometheus binary. default: /var/lib/prometheus
     java_home: java home path. default: /opt/java/default
+    zookeeper_wait_to_start_delay_seconds: time to wait before starting to poll zookeeper to start. default: 10
+    zookeeper_wait_to_start_timeout_seconds: time to wait for zookeeper to starts. default: 20
     kafka_start_wait_seconds: seconds to wait after starting zookeeper before starting kafka. default: 30
     stable_rolling_update: wait for the cluster to became stable if true. default: true
     stable_rolling_update_retries: number of retries for getting cluster state. default: 12

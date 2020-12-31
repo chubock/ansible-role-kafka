@@ -110,6 +110,13 @@
     state: restarted
     enabled: yes
 
+- name: wait for zookeeper to starts
+  wait_for:
+    delay: "{{ zookeeper_wait_to_start_delay_seconds }}"
+    port: "{{ zookeeper.port }}"
+    state: started
+    timeout: "{{ zookeeper_wait_to_start_timeout_seconds }}"
+
 - name: enabling and starting kafka service
   systemd:
     name: kafka
