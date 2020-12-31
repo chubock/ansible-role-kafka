@@ -1,19 +1,14 @@
 ---
 kafka_installation_path: /var/lib/kafka
 kafka_url: https://downloads.apache.org/kafka/2.7.0/kafka_2.13-2.7.0.tgz
-zookeeper_config_template: zookeeper.properties.j2
-zookeeper_service_template: zookeeper.service.j2
 kafka_config_template: server.properties.j2
 kafka_service_template: kafka.service.j2
 prometheus_exporter: true
 prometheus_path: /var/lib/prometheus
 java_home: /opt/java/default
-zookeeper_wait_to_start_delay_seconds: 10
-zookeeper_wait_to_start_timeout_seconds: 20
 stable_rolling_update: true
 stable_rolling_update_retries: 12
 stable_rolling_update_delay: 5
-
 
 broker:
   id: "{{ brokerId }}"
@@ -70,15 +65,8 @@ transaction:
         isr: 2
 
 zookeeper:
-  hosts: "{{groups['kafka']}}"
+  hosts: "{{groups['zookeeper']}}"
   port: 2181
-  dataDir: /data/zookeeper
-  maxClientCnxns: 60
-  admin:
-    enableServer: true
-    serverPort: 8080
-  initLimit: 10
-  syncLimit: 5
   connection:
     timeout:
       ms: 6000

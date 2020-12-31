@@ -7,7 +7,9 @@ Type=simple
 User=kafka
 Environment=JAVA_HOME={{ java_home }}
 {% if prometheus_exporter %}
-Environment="KAFKA_OPTS=-javaagent:{{ prometheus_path }}/jmx_prometheus_javaagent-0.13.0.jar=18080:{{ prometheus_path }}/kafka-2_0_0.yml  -javaagent:{{ kafka_installation_path }}/jolokia-jvm-1.6.2-agent.jar"
+Environment="KAFKA_OPTS=-javaagent:{{ prometheus_path }}/jmx_prometheus_javaagent-0.13.0.jar=18080:{{ prometheus_path }}/kafka-2_0_0.yml -javaagent:{{ kafka_installation_path }}/jolokia-jvm-1.6.2-agent.jar"
+{% else %}
+Environment="KAFKA_OPTS=-javaagent:{{ kafka_installation_path }}/jolokia-jvm-1.6.2-agent.jar"
 {% endif %}
 ExecStart=/bin/sh -c '{{ kafka_installation_path }}/bin/kafka-server-start.sh {{ kafka_installation_path }}/config/server.properties > {{ kafka_installation_path }}/kafka.log 2>&1'
 ExecStop=/var/lib/kafka/bin/kafka-server-stop.sh

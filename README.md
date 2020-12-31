@@ -3,35 +3,36 @@ Role Name
 
 A role to install `Apache Kafka` cluster.
 
+Requirements
+------------
+
+`Apache Kafka` requires `Java`. If java is installed on the host, specify it's location with `java_home` variable. Otherwise, The `chubock.java` role which is declared as a dependency for this role will try to install `Java` on the host. for more information about `chubock.java` visit [ansible-role-java](https://github.com/chubock/ansible-role-java). To set up an `Apache Zookeeper` cluster you can use `chubock.zookeeper` role. for more information visit [ansible-role-zookeeper](https://github.com/chubock/ansible-role-zookeeper)
+
+
 Role Variables
 --------------
 
-The variable `borkerId` should be defined at host level and indicates the zookeeper instance id and kafka broker id:
+The variable `borkerId` should be defined at host level and indicates the kafka broker id:
 
     [kafka]
-    docker1.local brokerId=1
-    docker2.local brokerId=2
-    docker3.local brokerId=3
+    kfk1.local brokerId=1
+    kfk2.local brokerId=2
+    kfk3.local brokerId=3
 
 The following variables are used for installation purposes:
 
     kafka_installation_path: where to install binaries. default: /var/lib/kafka
     kafka_url: where to download binaries from. default: https://downloads.apache.org/kafka/2.7.0/kafka_2.13-2.7.0.tgz
-    zookeeper_config_template: zookeeper configuration file template. default: zookeeper.properties.j2
-    zookeeper_service_template: zookeeper service file template. default: zookeeper.service.j2
     kafka_config_template: kafka configuration file template. default:server.properties.j2
     kafka_service_template: kafka template. default: kafka.service.j2
     prometheus_exporter: whether to install prometheus exporter or not. default: true
     prometheus_path: path to install prometheus binary. default: /var/lib/prometheus
     java_home: java home path. default: /opt/java/default
-    zookeeper_wait_to_start_delay_seconds: time to wait before starting to poll zookeeper to start. default: 10
-    zookeeper_wait_to_start_timeout_seconds: time to wait for zookeeper to starts. default: 20
-    kafka_start_wait_seconds: seconds to wait after starting zookeeper before starting kafka. default: 30
     stable_rolling_update: wait for the cluster to became stable if true. default: true
     stable_rolling_update_retries: number of retries for getting cluster state. default: 12
     stable_rolling_update_delay: seconds to wait after each retry to get the cluster state. default: 5
 
-The following variables are kafka and zookeeper configuration properties. variables used for kafka configuration has the same name as kafka configuration properties and variables used to configure zookeeper has the same name as zookeeper configuration variables prefixed with `zookeeper.`:
+The following variables are kafka configuration properties. variables used for kafka configuration has the same name as kafka configuration properties:
 
     broker:
       id: "{{ brokerId }}"
@@ -90,13 +91,6 @@ The following variables are kafka and zookeeper configuration properties. variab
     zookeeper:
       hosts: "{{groups['kafka']}}"
       port: 2181
-      dataDir: /data/zookeeper
-      maxClientCnxns: 60
-      admin:
-        enableServer: true
-        serverPort: 8080
-      initLimit: 10
-      syncLimit: 5
       connection:
         timeout:
           ms: 6000

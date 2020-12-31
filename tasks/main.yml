@@ -20,20 +20,6 @@
     owner: kafka
     group: kafka
 
-- name: check {{ zookeeper.dataDir }} directory existense
-  file:
-    path: "{{ zookeeper.dataDir }}"
-    state: directory
-    owner: kafka
-    group: kafka
-
-- name: updating zookeeper myid file
-  template:
-    src: myid.j2
-    dest: "{{ zookeeper.dataDir }}/myid"
-    owner: kafka
-    group: kafka
-
 - name: check if bin folder exists.
   stat:
     path: "{{ kafka_installation_path }}/bin"
@@ -87,35 +73,10 @@
     owner: kafka
     group: kafka
 
-- name: updating zookeeper.properties file
-  template:
-    src: "{{ zookeeper_config_template }}"
-    dest: "{{ kafka_installation_path }}/config/zookeeper.properties"
-    owner: kafka
-    group: kafka
-
 - name: updating kafka.service systemd file
   template:
     src: "{{ kafka_service_template }}"
     dest: /lib/systemd/system/kafka.service
-
-- name: updating kafka.service systemd file
-  template:
-    src: "{{ zookeeper_service_template }}"
-    dest: /lib/systemd/system/zookeeper.service
-
-- name: enabling and starting zookeeper service
-  systemd:
-    name: zookeeper
-    state: restarted
-    enabled: yes
-
-- name: wait for zookeeper to starts
-  wait_for:
-    delay: "{{ zookeeper_wait_to_start_delay_seconds }}"
-    port: "{{ zookeeper.port }}"
-    state: started
-    timeout: "{{ zookeeper_wait_to_start_timeout_seconds }}"
 
 - name: enabling and starting kafka service
   systemd:
