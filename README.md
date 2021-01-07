@@ -21,16 +21,46 @@ The variable `borkerId` should be defined at host level and indicates the kafka 
 
 The following variables are used for installation purposes:
 
-    kafka_installation_path: where to install binaries. default: /var/lib/kafka
-    kafka_url: where to download binaries from. default: https://downloads.apache.org/kafka/2.7.0/kafka_2.13-2.7.0.tgz
-    kafka_config_template: kafka configuration file template. default:server.properties.j2
-    kafka_service_template: kafka template. default: kafka.service.j2
-    prometheus_exporter: whether to install prometheus exporter or not. default: true
-    prometheus_path: path to install prometheus binary. default: /var/lib/prometheus
-    java_home: java home path. default: /opt/java/default
-    stable_rolling_update: wait for the cluster to became stable if true. default: true
-    stable_rolling_update_retries: number of retries for getting cluster state. default: 12
-    stable_rolling_update_delay: seconds to wait after each retry to get the cluster state. default: 5
+where to install binaries:
+
+    kafka_installation_path: /var/lib/kafka
+
+where to download binaries from:
+
+    kafka_url: https://downloads.apache.org/kafka/2.7.0/kafka_2.13-2.7.0.tgz
+    
+kafka configuration file template:
+    
+    kafka_config_template: server.properties.j2
+    
+kafka systemd service template:
+    
+    kafka_service_template: kafka.service.j2
+    
+whether to install prometheus exporter or not:
+    
+    prometheus_exporter: true
+    
+path to install prometheus binaries:
+    
+    prometheus_path: /var/lib/prometheus
+        
+java home path:
+    
+    java_home: /opt/java/default
+    
+    
+to wait for the cluster to became stable or not:
+    
+    stable_rolling_update: true
+    
+number of retries for getting cluster state:
+
+    stable_rolling_update_retries: 12
+    
+seconds to wait after each retry to get the cluster state:    
+    
+    stable_rolling_update_delay: 5
 
 The following variables are kafka configuration properties. variables used for kafka configuration has the same name as kafka configuration properties:
 
